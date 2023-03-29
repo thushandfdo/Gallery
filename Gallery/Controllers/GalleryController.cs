@@ -20,7 +20,7 @@ namespace Gallery.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> PostAsync([FromForm] DTOImage image)
+        public async Task<ActionResult> PostImage([FromForm] DTOImage image)
         {
             if (image == null || image.Image == null)
             {
@@ -52,18 +52,22 @@ namespace Gallery.Controllers
             await _context.Images.AddAsync(newImage);
             _context.SaveChanges();
 
-            //if (!System.IO.File.Exists(filePath))
-            //{
-            //    return NotFound("Not found");
-            //}
-
-            //var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
-
-            //var fileExtension = Path.GetExtension(filePath);
-
-            //return new FileStreamResult(fileStream, $"image/{fileExtension[1..]}");
-
             return Ok("Image Saved");
+        }
+
+        [HttpGet("{eventId}")]
+        public async Task<ActionResult<IFormFile>> GetImage(int eventId)
+        {
+            var filePath = $"./Gallery/{eventId}.png";
+
+            if (!System.IO.File.Exists(filePath))
+            {
+                return NotFound("Not found");
+            }
+
+            var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read);
+
+            return new FileStreamResult(fileStream, $"image/png");
         }
     }
 }
